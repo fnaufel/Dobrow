@@ -6,7 +6,7 @@ knit: "bookdown::render_book"
 title: "Introduction to Stochastic Processes With R, by Robert P. Dobrow"
 description: "Notes"
 author: "Fernando Náufel"
-date: "`r format(Sys.Date(), '%d/%m/%Y')`)"
+date: "`r format(Sys.Date(), '%d/%m/%Y')`"
 lang: 'en'
 
 cover-image: images/?????
@@ -14,20 +14,13 @@ cover-image: images/?????
 documentclass: "report"
 classoption: '11pt'
 geometry: 'margin=1in'
-bibliography: []
+bibliography: ['bibliography.bib']
 link-citations: yes
 
-# Bibliography style: 
-# choose one and delete the other:
-
-# For Chicago in English
-csl: |
-  `r if(knitr::is_html_output())
-   'html_files/chicago-fullnote-bibliography.csl' else
-   'pdf_files/chicago-author-date.csl'`
+csl: html_files/chicago-author-date.csl
 
 ---
 
-# Intro {- #intro}
+# Introduction { - }
 
-bla
+Notes about [@RobertP.Dobrow1345].

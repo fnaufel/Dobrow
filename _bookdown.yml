@@ -28,5 +28,6 @@ before_chapter_script: 'before_chapter.R'
 
 rmd_files: [
   'index.Rmd',
+  'appendixB.Rmd',
   'refs.Rmd'
 ]

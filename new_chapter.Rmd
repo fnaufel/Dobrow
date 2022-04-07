@@ -2,5 +2,5 @@
 knit: "bookdown::render_book"
 ---
 
-# bla {#bla}
+# Appendix B: Probability review {#prob-review}
 
