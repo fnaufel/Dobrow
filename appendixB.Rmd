@@ -39,7 +39,7 @@ knit: "bookdown::render_book"
 
   > A real random vector ${\displaystyle \mathbf {X} =(X_{1},\ldots ,X_{k})^{\mathrm {T} }}$ is called a standard normal random vector if all of its components ${\displaystyle X_{k}}$ are independent and each is a zero-mean unit-variance normally distributed random variable, i.e. if ${\displaystyle X_{k}\sim \ {\mathcal {N}}(0,1)}$ for all ${\displaystyle k}$.
 
-* For normal RVs, independence implies $\rho_{XY} = 0$. So, according to this definition, the [standard bivariate normal]{.hl} has PDF
+* For any RVs $X$ and $Y$, independence implies $\rho_{XY} = 0$. So, according to this definition, the [standard bivariate normal]{.hl} has PDF
 
   $$
   f(x, y) = \frac{1}{2\pi} \cdot 
@@ -48,4 +48,6 @@ knit: "bookdown::render_book"
   \right)
   $$
 
-* The conditional distribution of $X \mid Y = y$ is
+  and corresponds only to the graphs on the left.
+
+* The conditional distribution of $X \mid Y = y$ is ...
