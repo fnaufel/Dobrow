@@ -3,9 +3,9 @@
 #   devtools::install_github("fnaufel/fnaufelRmd")
 
 fnaufelRmd::bs4_book:
-  url: 'https\://fnaufel.github.io/??????'
-  github-repo: fnaufel/??????
-  repo: https://github.com/fnaufel/???????
+  url: 'https\://fnaufel.github.io/Dobrow/'
+  github-repo: fnaufel/Dobrow
+  repo: https://github.com/fnaufel/Dobrow
   # If not using Portuguese, change lang: 'pt-br' in your .Rmd file
   # and uncomment this next line:
   #
