@@ -1,0 +1,174 @@
+---
+knit: "bookdown::render_book"
+---
+
+# Introduction and review
+
+## Deterministic and Stochastic Models
+
+### Example 1.2 (SIR model) {-}
+
+::: {.rmdbox latex=1}
+
+* $S_t = {}$ number of [susceptible]{.hl} people at time $t$.
+
+* $I_t = {}$ number of [newly infected]{.hl} people at time $t$.
+
+* $R_t = {}$ number of [recovered]{.hl} people at time $t$.
+
+* $z = {}$ probability that a [susceptible]{.hl} individual [becomes infected]{.hl} once in contact with an infected person.
+
+* Assume every susceptible person comes in contact with every infected person.
+
+:::
+
+* Probability $p$ that a susceptible individual becomes infected at a point in time:
+
+  $$
+  p_t = 1 - (1 - z)^{I_{t-1}}
+  $$
+
+  ::: {.rmdwarning latex=1}
+  
+  The book has the exponent as $I_{t}$, but the correct exponent is $I_{t - 1}$.
+  
+  In this discrete time model, we compute the number of newly infected people as a function of the number of people infected at the previous time step.
+  
+  :::
+  
+
+* This is because $(1 - z)^{I_{t - 1}}$ is the probability that the person has contact with all $I_{t-1}$ infected people and [does not become infected]{.hl}.
+
+* The number of newly infected people $I_{t}$ follows a binomial distribution with $n = S_{t-1}$ and probability of success $p_t$:
+
+  $$
+  I_{t} \sim \text{Bin}(S_{t-1}, p_t)
+  $$
+  
+  so the PMF is
+  
+  $$
+  P(I_{t} = k) = \binom{S_{t-1}}{k} \; p_t^k \; (1 - p_t)^{S_{t-1} - k}
+  $$
+  
+* Then the number of susceptible people at time $t$ is 
+
+  $$
+  S_{t} = S_{t-1} - I_{t}
+  $$
+
+* This simplified example does not take into account the transition from infected to recovered. 
+
+* $I_t$ is the number of *newly* infected people at time $t$.
+
+* In the computation, only newly infected people are contagious. It's as if people remain infected and contagious for one time step only.
+
+
+#### Simulations {-}
+
+```{r echo = FALSE}
+sir <- function(i0, s0, z, steps) {
+  
+  i <- vector('integer', steps + 1)
+  i[1] <- i0
+  
+  s <- vector('integer', steps + 1)
+  s[1] <- s0
+  
+  for (t in 2:(steps + 1)) {
+    
+    pt <- 1 - (1 - z)^i[t - 1]
+    
+    i[t] <- rbinom(1, s[t - 1], pt)
+    s[t] <- s[t - 1] - i[t]
+    
+  }
+  
+  df <- tibble(
+    t = 0:steps,
+    i = i,
+    s = s
+  ) 
+  
+  iplot <- df %>% 
+    ggplot(aes(x = t)) +
+      geom_line(aes(y = i), color = 'red') +
+      geom_point(aes(y = i), color = 'red') +
+      scale_y_continuous(limits = c(0, NA)) +
+      labs(
+        x = 'time',
+        y = NULL,
+        title = 'Newly infected individuals'
+      )
+  
+  splot <- df %>% 
+    ggplot(aes(x = t)) +
+      geom_line(aes(y = s), color = 'brown') +
+      geom_point(aes(y = s), color = 'brown') +
+      scale_y_continuous(limits = c(0, NA)) +
+      labs(
+        x = 'time',
+        y = NULL,
+        title = 'Susceptible individuals'
+      )
+  
+  final <- (iplot | splot) + 
+    plot_annotation(
+      title = TeX(
+          paste0(
+            'SIR:  $I_0 = $', i0,
+            ',  $S_0 = $', s0,
+            ',  $z = $', z
+          )
+        ),
+      theme = theme(
+        plot.background = element_rect(color = 'black'),
+        plot.title = element_text(hjust = .5),
+        plot.margin = margin(20, 5, 5, 5)
+      )
+    )
+  
+  final
+  
+}
+```
+
+```{r echo=FALSE}
+i0 <- 3
+s0 <- 400
+z <- .004
+steps <- 20
+
+sir(i0, s0, z, steps)
+```
+
+```{r echo=FALSE}
+i0 <- 3
+s0 <- 400
+z <- .01
+
+sir(i0, s0, z, steps)
+```
+
+```{r echo=FALSE}
+i0 <- 3
+s0 <- 400
+z <- .1
+
+sir(i0, s0, z, steps)
+```
+
+```{r echo=FALSE}
+i0 <- 100
+s0 <- 1000
+z <- .001
+
+sir(i0, s0, z, steps)
+```
+
+
+## What is a stochastic process?
+
+### Example 1.6 (Random walk and gambler's ruin) {-}
+
+...

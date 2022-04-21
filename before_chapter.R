@@ -5,4 +5,6 @@ source(
   )
 )
 
-knitr::opts_chunk$set(echo = FALSE)
+knitr::opts_chunk$set(echo = TRUE)
+
+library(patchwork)

@@ -13,15 +13,17 @@ knit: "bookdown::render_book"
   $$
   f(x, y) = \frac{1}{2\pi\tau} \cdot 
   \exp\left(
-    -\frac{1}{2\tau^2} \cdot (x^2 + y^2 - 2\rho xy)
+    -\frac{1}{2\tau^2} \cdot (x^2 - 2\rho xy + y^2)
   \right)
   $$
 
-  with $\tau = \sqrt{1 - \rho^2}$.
+  with $\tau = \sqrt{1 - \rho^2}$, where $\rho$ is the [correlation]{.hl} between $X$ and $Y$.
 
-* If these marginal distributions of $X$ and $Y$ are given, $\rho$ is still free to vary in $[-1, 1]$.
+* If the marginal distributions of $X$ and $Y$ are given, $\rho$ is still free to vary in $[-1, 1]$.
 
-* This figure from [@JosephK.Blitzstein989] shows two bivariate normals with the same marginal distributions but different correlations $\rho_{XY}$:
+* So, there are [five parameters]{.hl}: $\mu_X$, $\sigma_X$, $\mu_Y$, $\sigma_Y$, and $\rho$.
+
+* This figure from [@JosephK.Blitzstein989] shows two bivariate normals with the same marginal distributions (the standard univariate normal) but different correlations $\rho$:
 
     ```{r}
     knitr::include_graphics('images/bvn.jpg')
@@ -39,7 +41,7 @@ knit: "bookdown::render_book"
 
   > A real random vector ${\displaystyle \mathbf {X} =(X_{1},\ldots ,X_{k})^{\mathrm {T} }}$ is called a standard normal random vector if all of its components ${\displaystyle X_{k}}$ are independent and each is a zero-mean unit-variance normally distributed random variable, i.e. if ${\displaystyle X_{k}\sim \ {\mathcal {N}}(0,1)}$ for all ${\displaystyle k}$.
 
-* For any RVs $X$ and $Y$, independence implies $\rho_{XY} = 0$. So, according to this definition, the [standard bivariate normal]{.hl} has PDF
+* For any RVs $X$ and $Y$, independence implies $\rho = 0$. So, according to this definition, the [standard bivariate normal]{.hl} has PDF
 
   $$
   f(x, y) = \frac{1}{2\pi} \cdot 
@@ -48,6 +50,92 @@ knit: "bookdown::render_book"
   \right)
   $$
 
-  and corresponds only to the graphs on the left.
+  and [corresponds only to the graphs on the left]{.hl}.
 
-* The conditional distribution of $X \mid Y = y$ is ...
+* In the general case, for $X \sim \mathcal N\left(\mu_X, \sigma^2_X\right)$, and $Y \sim \mathcal N\left(\mu_Y, \sigma^2_Y\right)$ and with $\rho \neq 0$, the PDF is
+
+  \begin{multline}
+  f(x,y) = \\ 
+  {
+    \frac {1}
+    {
+      2\pi \sigma _{X}\sigma _{Y}\tau
+    }
+  }\cdot \exp \left(
+    -{
+      \frac {1}{2\tau^2}
+    }\left[
+      \left(
+        {\frac {x-\mu _{X}}{\sigma_{X}}}
+      \right)^{2} -
+      2\rho \left(
+        {\frac {x-\mu _{X}}{\sigma_{X}}}
+      \right)
+      \left(
+        {\frac {y-\mu _{Y}}{\sigma_{Y}}}
+      \right) +
+      \left(
+        {\frac {y-\mu _{Y}}{\sigma_{Y}}}
+      \right)^{2}
+    \right]
+  \right)
+  \end{multline}
+
+  with $\tau = \sqrt{1 - \rho^2}$ as before.
+  
+* The PDF of the conditional distribution of $X$ given $Y = y$ is
+
+  $$
+  f_{X \mid Y} (x, y) = 
+  \frac{f(x, y)}{f_Y(y)}
+  $$
+  
+  where $f_Y$ is the marginal PDF
+  
+  $$
+  \begin{aligned}
+  f_Y(y) &= \int_{-\infty}^\infty f(x, y)\, dx \\
+  &= \frac{1}{\sigma_Y \sqrt{2\pi}} 
+     \cdot 
+     \exp\left( -(y - \mu_Y)^2 / 2 \sigma_Y^2 \right)
+  \end{aligned}
+  $$
+
+  yielding
+  
+  $$
+  \begin{aligned}
+  f_{X \mid Y} (x, y) 
+  &= \frac{f(x, y)}{f_Y(y)} \\
+  &= \frac{
+    {
+      \frac {1}
+      {
+        2\pi \sigma _{X}\sigma _{Y}\tau
+      }
+    }\cdot \exp \left(
+      -{
+        \frac {1}{2\tau^2}
+      }\left[
+        \left(
+          {\frac {x-\mu _{X}}{\sigma_{X}}}
+        \right)^{2} -
+        2\rho \left(
+          {\frac {x-\mu _{X}}{\sigma_{X}}}
+        \right)
+        \left(
+          {\frac {y-\mu _{Y}}{\sigma_{Y}}}
+        \right) +
+        \left(
+          {\frac {y-\mu _{Y}}{\sigma_{Y}}}
+        \right)^{2}
+      \right]
+    \right)
+  }{
+    \frac{1}{\sigma_Y \sqrt{2\pi}} 
+       \cdot 
+       \exp\left( -(y - \mu_Y)^2 / 2 \sigma_Y^2 \right)
+    } 
+  \\
+  \end{aligned}
+  $$
