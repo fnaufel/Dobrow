@@ -260,26 +260,28 @@ plot_ruin(k, n, p, plays, nsims)
 
 ## Conditional probabilities
 
-### Example 1.10 (Gambler's ruin)
+### Example 1.10 (Gambler's ruin) {-}
 
+::: {.rmdbox latex=1}
+
+* $k = {}$ initial amount of money player A has.
+
+* $n = {}$ total amount of money, so player B starts with $n - k$.
+
+* $p = {}$ the probability that A wins a round.
+
+* $q = {}$ the probability that B wins a round, so $q = 1 - p$.
+
+* $p_k = {}$ the probability that player A wins, if A starts with $k$. [This is what we want to find.]{.hl}
+
+:::
+  
 * The book only considers the case where $p = q = 1/2$.
 
 * A more general analysis is found in @JosephK.Blitzstein989.
 
 * A link about solving recurrent equations: http://web.cs.wpi.edu/~cs2223/d98/notes/recurrence/solve/solve.html
 
-* Notation:
-
-  * $k = {}$ initial amount of money player A has.
-  
-  * $n = {}$ total amount of money, so player B starts with $n - k$.
-  
-  * $p = {}$ the probability that A wins a round.
-  
-  * $q = {}$ the probability that B wins a round, so $q = 1 - p$.
-  
-  * $p_k = {}$ the probability that player A wins, if A starts with $k$. [This is what we want to find.]{.hl}
-  
 * Conditioning on the first step:
 
   $$
@@ -360,4 +362,96 @@ plot_ruin(k, n, p, plays, nsims)
   \frac k n  &\text{ if } p = q 
   \end{cases}
   $$
+
+
+### Example 1.12 (Choosing integers) {-}
+
+::: {.rmdbox latex=1}
+
+* $X \sim \text{DUnif}(1, 100)$.
+
+* $Y \sim \text{DUnif}(1, X)$.
+
+* Find $P(Y = y \mid X = x)$.
+
+:::
+
+* $P(Y = y \mid X = x) = 1/x$, for $y \in \{1, \ldots, x \}$.
+
+
+### Example 1.13 (Joint, marginal, conditional) {-}
+
+::: {.rmdbox latex=1}
+
+* [Joint]{.hl} distribution: 
+
+  $$
+  P(X = x, Y = y) = \frac{x + y}{18} \quad\text{ for }\quad (x, y) \in \{0, 1, 2\} \times \{0, 1, 2\}
+  $$
+
+* Find the [conditional]{.hl} $P(Y = y \mid X = x)$.
+
+:::
+
+* The conditional will be 
+
+  $$
+  P(Y = y \mid X = x) = \frac{P(X = x, Y = y)}{P(X = x)}
+  $$
+
+* To find $P(X = x)$ --- the [marginal]{.hl} distribution of $X$:
+
+  $$
+  \begin{aligned}
+  P(X = x) &= \sum_{y \in \{0, 1, 2\}} P(X = x, Y = y) \\
+  &= P(X = x, Y = 0) + P(X = x, Y = 1) + P(X = x, Y = 2) \\
+  &= \frac{x + x + 1 + x + 2}{18} \\
+  &= \frac{x + 1}{6}
+  \end{aligned}
+  $$
+
+* Now
+
+  $$
+  \begin{aligned}
+  P(Y = y \mid X = x) 
+  &= \frac{P(X = x, Y = y)}{P(X = x)} \\
+  &= \frac{\frac{x + y}{18}}{\frac{x + 1}{6}} \\
+  &= \frac{x + y}{3(x + 1)}
+  \end{aligned}
+  $$
+
+
+### Example 1.15 (Continuous RVs) {-}
+
+::: {.rmdbox latex=1}
+
+* Joint density
+
+  $$
+  f(x, y) = e^{-x} \quad \text{for}\quad 0 < y < x < \infty
+  $$
+
+* Find $P(Y < 2 \mid X = 5)$.
+
+:::
+
+* Just for fun, here is an [interactive]{.hl} graph of $f(x, y) = e^{-x}$ in part of this domain:
+
+    ```{r echo=FALSE, message=FALSE}
+    library(rgl)
+    setupKnitr(autoprint = TRUE)
+    
+    persp3d(
+      function(x, y) { 
+        ifelse(y < x, exp(-x), NA)
+      },
+      xlim = c(0, 3),
+      ylim = c(0, 3),
+      col = 'blue',
+      alpha = .6,
+      zlab = ''
+    )
+    ```
+
 
