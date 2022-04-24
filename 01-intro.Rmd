@@ -171,4 +171,193 @@ sir(i0, s0, z, steps)
 
 ### Example 1.6 (Random walk and gambler's ruin) {-}
 
-...
+```{r echo=FALSE}
+sim_ruin <- function(k, n, p, plays) {
+  
+  results <- vector('integer', plays + 1)
+  results[1] <- k
+  results[2:(plays + 1)] <- 
+    sample(c(1, -1), plays, replace = TRUE, prob = c(p, 1 - p))
+  
+  results <- cumsum(results)
+  last <- match(TRUE, results == 0 | results == n)
+  
+  if (!is.na(last))
+    results[(last + 1):(plays + 1)] <- NA
+  
+  results
+  
+}
+```
+
+```{r echo=FALSE}
+plot_ruin <- function(k, n, p, plays, nsims) {
+  
+  graphs <- vector('list', nsims)
+
+  for (i in 1:nsims) {
+    
+    graphs[[i]] <-
+      tibble(gain = sim_ruin(k, n, p, plays)) %>% 
+      ggplot(aes(x = 1:length(gain), y = gain)) +
+        geom_line() +
+        geom_hline(yintercept = 0, linetype = 'dashed') +
+        geom_hline(yintercept = n, linetype = 'dashed') +
+        labs(
+          x = NULL,
+          y = NULL
+        )
+  }
+  
+  final <- wrap_plots(graphs, ncol = 3) +
+    plot_annotation(
+      title = TeX(
+        paste0(
+          'Gambler\'s ruin:  $k = {}$', k,
+          ',  $n = {}$', n,
+          ',  $p = {}$', p %>% round(2)
+        )
+      ),
+      theme = theme(
+        plot.background = element_rect(color = 'black'),
+        plot.title = element_text(hjust = .5),
+        plot.margin = margin(20, 5, 5, 5)
+      )
+    )
+
+  final
+   
+}
+```
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+k <- 20   # Initial value
+n <- 60   # Value where to stop
+p <- .5  # Probability of winning
+plays <- 1000
+nsims <- 9
+
+plot_ruin(k, n, p, plays, nsims)
+```
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+k <- 50   # Initial value
+n <- 100   # Value where to stop
+p <- .5  # Probability of winning
+plays <- 1000
+nsims <- 9
+
+plot_ruin(k, n, p, plays, nsims)
+```
+
+
+## Monte Carlo simulation
+
+* No notes for now.
+
+* But @wagaman-2021-probab has a good chapter on Monte Carlo simulation.
+
+
+## Conditional probabilities
+
+### Example 1.10 (Gambler's ruin)
+
+* The book only considers the case where $p = q = 1/2$.
+
+* A more general analysis is found in @JosephK.Blitzstein989.
+
+* A link about solving recurrent equations: http://web.cs.wpi.edu/~cs2223/d98/notes/recurrence/solve/solve.html
+
+* Notation:
+
+  * $k = {}$ initial amount of money player A has.
+  
+  * $n = {}$ total amount of money, so player B starts with $n - k$.
+  
+  * $p = {}$ the probability that A wins a round.
+  
+  * $q = {}$ the probability that B wins a round, so $q = 1 - p$.
+  
+  * $p_k = {}$ the probability that player A wins, if A starts with $k$. [This is what we want to find.]{.hl}
+  
+* Conditioning on the first step:
+
+  $$
+  p_k = p_{k+1} \cdot p \;+\; p_{k-1} \cdot q
+  $$
+  
+* This recurrence has characteristic equation
+
+  $$
+  px^2 - x + q = 0
+  $$
+  
+* The roots of this equation are
+
+  $$
+  x = \frac qp \quad \text{and}\quad x = 1
+  $$
+  
+* If $p \neq q$ (i.e., A and B have different probabilities of winning a round), these roots will be distinct, so
+
+  $$
+  p_k = A \cdot 1^k + B \left( \frac qp \right)^k = 
+  A + B \left( \frac qp \right)^k
+  $$
+  
+* To find $A$ and $B$, we consider the boundary conditions:
+
+  $$
+  p_0 = 0 \quad \text{and}\quad p_n = 1
+  $$
+
+  ::: {.rmdnote latex=1}
+  
+  These values correspond to $p_k$ being the probability of A winning when he starts from $k$.
+    
+  Note that [this is the first time]{.hl} in our reasoning [where we have to decide if $p_k$ is the probability of A winning or the probability of A losing]{.hl} when he starts from $k$.
+    
+  If we switch the values of $p_0$ and $p_n$, then we are computing $p_k$ as the probability of A losing when he starts from $k$.
+    
+  The recurrence is the same (because the situation is symmetric), with only the boundary conditions being different.
+  
+  :::
+
+* We finally get
+
+  $$
+  A = \frac{1}{1 - \left(\frac{q}{p}\right)^n}
+  \quad\text{and}\quad
+  B = -A
+  $$
+  
+* So, [when $p \neq q$,]{.hl}
+
+  $$
+  p_k = \frac{1 - \left(\frac{q}{p}\right)^k}
+  {1 - \left(\frac{q}{p}\right)^n}
+  $$
+  
+* If $p = q$ (i.e., A and B have the same probability of winning a round), both roots will be equal to $1,$ so
+
+  $$
+  p_k = A \cdot 1^k+ B \cdot k \cdot 1^k = A + Bk
+  $$
+
+* Using the boundary conditions, we get, [when $p = q$,]{.hl}
+
+  $$
+  p_k = \frac k n
+  $$
+
+* To summarize, the probability $p_k$ that A wins starting from $k$ is
+
+  $$
+  p_k = 
+  \begin{cases}
+  \frac{1 - \left(\frac{q}{p}\right)^k}
+  {1 - \left(\frac{q}{p}\right)^n} &\text{ if } p \neq q \\
+  \frac k n  &\text{ if } p = q 
+  \end{cases}
+  $$
+
