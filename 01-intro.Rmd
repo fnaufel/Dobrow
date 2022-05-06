@@ -439,6 +439,19 @@ plot_ruin(k, n, p, plays, nsims)
 * Just for fun, here is an [interactive]{.hl} graph of $f(x, y) = e^{-x}$ in part of this domain:
 
     ```{r echo=FALSE, message=FALSE}
+    U <- c(
+      0.732903778553009, 0.320359438657761, -0.600183129310608, 0,
+      -0.680093824863434, 0.321718066930771, -0.658762276172638, 0,
+      -0.0179509744048119, 0.89099109172821, 0.453663349151611, 0, 
+      0, 0, 0, 1
+    )
+    
+    UM <- matrix(U, nrow = 4)
+    
+    par3d(
+      userMatrix = UM
+    )
+
     persp3d(
       function(x, y) { 
         ifelse(y < x, exp(-x), NA)
@@ -446,7 +459,7 @@ plot_ruin(k, n, p, plays, nsims)
       xlim = c(0, 6),
       ylim = c(0, 6),
       col = 'blue',
-      alpha = .6,
+      alpha = .4,
       zlab = ''
     )
     ```
@@ -503,6 +516,19 @@ plot_ruin(k, n, p, plays, nsims)
 * The probability corresponds to the area of the [rectangle outlined in red]{.hl} in the graph below, [after the area of the green strip is normalized to $1$]{.hl}; in other words, the rectangle outlined in red has $2/5$ of the area of the green strip.
 
     ```{r echo=FALSE, message=FALSE}
+    U <- c(
+      0.732903778553009, 0.320359438657761, -0.600183129310608, 0,
+      -0.680093824863434, 0.321718066930771, -0.658762276172638, 0,
+      -0.0179509744048119, 0.89099109172821, 0.453663349151611, 0, 
+      0, 0, 0, 1
+    )
+    
+    UM <- matrix(U, nrow = 4)
+    
+    par3d(
+      userMatrix = UM
+    )
+
     persp3d(
       function(x, y) {
         ifelse(y < x, exp(-x), NA)
