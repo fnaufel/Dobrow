@@ -439,19 +439,153 @@ plot_ruin(k, n, p, plays, nsims)
 * Just for fun, here is an [interactive]{.hl} graph of $f(x, y) = e^{-x}$ in part of this domain:
 
     ```{r echo=FALSE, message=FALSE}
-    library(rgl)
-    setupKnitr(autoprint = TRUE)
-    
     persp3d(
       function(x, y) { 
         ifelse(y < x, exp(-x), NA)
       },
-      xlim = c(0, 3),
-      ylim = c(0, 3),
+      xlim = c(0, 6),
+      ylim = c(0, 6),
       col = 'blue',
       alpha = .6,
       zlab = ''
     )
     ```
+
+* The pdf of the [conditional]{.hl} RV $Y \mid X$ will be
+
+  $$
+  f_{Y \mid X} \; (y \mid x) = \frac{f(x, y)}{f_X(x)}
+  $$
+
+  ::: {.rmdnote latex=1}
+  
+  We write $f_{Y \mid X} \; (y \mid x)$ to emphasize the fact that [this is a function of $y$ only]{.hl}, given a fixed value of $x$.
+  
+  :::
+  
+* To find the [marginal]{.hl} pdf $f_X(x)$:
+
+  $$
+  \begin{aligned}
+    f_X(x) 
+    &= \int_{-\infty}^\infty f(x,y) \; dy \\
+    &= \int_{0}^x f(x,y) \; dy \\
+    &= \int_{0}^x e^{-x} \; dy \\
+    &= xe^{-x}
+  \end{aligned}
+  $$
+  
+* So
+
+  $$
+  \begin{aligned}
+  f_{Y \mid X} \; (y \mid x) 
+  &= \frac{f(x, y)}{f_X(x)} \\
+  &= \frac{e^{-x}}{xe^{-x}} \\
+  &= \frac1x
+  \end{aligned}
+  $$
+
+* For fixed $x$, the conditional is uniform.
+
+* This is expected, because $f(x, y) = e^{-x}$ does not depend on $y$.
+
+* Now
+
+  $$
+  \begin{aligned}
+    P(Y < 2 \mid X = 5)
+    &= \int_0^2 \frac15\;dy \\
+    &= \frac25
+  \end{aligned}
+  $$
+  
+* The probability corresponds to the area of the [rectangle outlined in red]{.hl} in the graph below, [after the area of the green strip is normalized to $1$]{.hl}; in other words, the rectangle outlined in red has $2/5$ of the area of the green strip.
+
+    ```{r echo=FALSE, message=FALSE}
+    persp3d(
+      function(x, y) {
+        ifelse(y < x, exp(-x), NA)
+      },
+      xlim = c(4, 6),
+      ylim = c(0, 6),
+      col = 'blue',
+      alpha = .4,
+      zlab = ''
+    )
+    
+    polygon3d(
+      x = rep(5, 4),
+      y = c(0, 2, 2, 0),
+      z = c(exp(-5), exp(-5), 0, 0),
+      coords = 2:3,
+      add = TRUE,
+      col = 'red',
+      alpha = 1,
+      fill = FALSE,
+      lwd = 3
+    )
+    
+    polygon3d(
+      x = rep(5, 4),
+      y = c(0, 5, 5, 0),
+      z = c(exp(-5), exp(-5), 0, 0),
+      coords = 2:3,
+      add = TRUE,
+      col = 'green',
+      alpha = .6
+    )
+    ```
+
+
+### Example 1.16 (Picking real numbers) {-}
+
+::: {.rmdbox latex=1}
+
+* $X$ is uniformly distributed on $(0, 1)$.
+
+* $Y$ is uniformly distributed on $(0, x)$.
+
+* Find the conditional distribution of $Y$ given $X = x$.
+
+* Find the joint distribution of $X$ and $Y$.
+
+* Find the marginal density of $Y$.
+
+:::
+
+* We know $f_X(x) = 1, \; \text{for }0 < x < 1$.
+
+* Once $X$ gets value $x$, we have $f_{Y \mid X}(y \mid x) = 1/x, \; \text{for }0 < y < x < 1$.
+
+* To get the joint distribution:
+
+  $$
+  \begin{aligned}
+    f_{Y \mid X}(y \mid x) = \frac{f(x,y)}{f_X(x)}
+    &\implies
+    f(x,y) = f_{Y \mid X}(y \mid x) \cdot f_X(x) \\
+    &\implies
+    f(x,y) = \frac1x \cdot 1 \\
+    &\implies
+    f(x,y) = \frac1x
+  \end{aligned}
+  $$
+
+  for $0 < y < x < 1$.
+
+* Then, for the marginal distribution of $Y$:
+
+  $$
+  \begin{aligned}
+    f_Y(y) 
+    &= \int_{-\infty}^\infty f(x,y) \;dx \\
+    &= \int_y^1 f(x,y) \;dx \\
+    &= \int_y^1 \frac1x \;dx \\
+    &= -\ln y
+  \end{aligned}
+  $$
+  
+  for $0 < y < 1$.
 
 

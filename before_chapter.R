@@ -8,3 +8,6 @@ source(
 knitr::opts_chunk$set(echo = TRUE)
 
 library(patchwork)
+library(rgl)
+setupKnitr(autoprint = TRUE)
+
