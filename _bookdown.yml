@@ -6,6 +6,7 @@ before_chapter_script: 'before_chapter.R'
 rmd_files: [
   'index.Rmd',
   '01-intro.Rmd',
+  '02-MC-first-steps.Rmd',
   'appendixB.Rmd',
   'refs.Rmd'
 ]

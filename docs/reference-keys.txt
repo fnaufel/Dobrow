@@ -3,3 +3,6 @@ deterministic-and-stochastic-models
 what-is-a-stochastic-process
 monte-carlo-simulation
 conditional-probabilities
+conditional-expectation
+markov-chains-first-steps
+introduction

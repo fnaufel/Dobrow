@@ -169,6 +169,19 @@ sir(i0, s0, z, steps)
 
 ## What is a stochastic process?
 
+::: {.rmdnote latex=1}
+
+#### Stochastic process {-}
+
+A collection of random variables
+$$
+\{ X_t,\; t \in I\}
+$$
+where the random variables are defined on a common state space. The set $I$ is the index set.
+
+:::
+
+
 ### Example 1.6 (Random walk and gambler's ruin) {-}
 
 ```{r echo=FALSE}
@@ -259,6 +272,43 @@ plot_ruin(k, n, p, plays, nsims)
 
 
 ## Conditional probabilities
+
+::: {.rmdnote latex=1}
+
+#### Law of total probability {-}
+
+If $B_1, \ldots, B_k$ partition the sample space, then for any event $A$
+$$
+P(A) = \sum_{i=1}^k P(A \cap B_i) = \sum_{i=1}^k P(A \mid B_i)P(B_i)
+$$
+
+:::
+
+::: {.rmdnote latex=1}
+
+#### Conditional probability mass/density {-}
+
+* Discrete case (mass):
+
+  $$
+  P(Y=y \mid X=x) =
+  \frac{P(X=x, Y=y)}{P(X=x)}
+  $$
+
+* Continuous case (density):
+
+  $$
+  f_{Y\mid X}(y \mid x) = 
+  \frac{f(x,y)}{f_X(x)}
+  $$
+
+  Conditional probability ($R \in \mathbb R$):
+  $$
+  P(Y \in R \mid X = x) = \int_R f_{Y \mid X}(y \mid x) \;dy
+  $$
+
+:::
+
 
 ### Example 1.10 (Gambler's ruin) {-}
 
@@ -615,3 +665,131 @@ plot_ruin(k, n, p, plays, nsims)
   for $0 < y < 1$.
 
 
+## Conditional expectation
+
+::: {.rmdnote latex=1}
+
+#### Conditional expectation of $Y$ given $X=x$ {-}
+
+* Discrete case:
+
+  $$
+  E(Y \mid X = x) = \sum_y y\; P(Y=y \mid X=x)
+  $$
+
+* Continuous case:
+
+  $$
+  E(Y \mid X = x) = 
+  \int_{-\infty}^\infty y \; f_{Y \mid X}(y \mid x) \; dy
+  $$
+
+Note this is a function of $x$.
+
+:::
+
+
+### Example 1.17 (School cafeteria registers) {-}
+
+::: {.rmdbox latex=1}
+
+* Let $X$ and $Y$ denote the numbers of customers at the first and second registers, resp.
+
+* The joint probability $P(X=x, Y=y)$ is given by the table
+
+    ```{r echo=FALSE, out.width='60%'}
+    knitr::include_graphics('images/example-01.17.png')
+    ```
+  
+* Find the expected number of people in line at the second register if there is one person at the first register.
+
+:::
+
+* We're looking for $E(Y \mid X = 1)$, given by
+
+  $$
+  E(Y \mid X = 1) = \sum_Y y\; P(Y = y \mid X = 1)
+  $$
+
+* In R:
+
+    ```{r}
+    y <- 0:4
+    line <- c(.14, .12, .06, .01, 0)
+    pyx1 <- line / sum(line)
+    pyx1
+    sum(y * pyx1)
+    ```
+
+
+### Example 1.18 (Independent Poisson RVs) {-}
+
+::: {.rmdbox latex=1}
+
+* $X \sim \text{Poisson}(\lambda)$.
+
+* $Y \sim \text{Poisson}(\mu)$.
+
+* $X \bot Y$.
+
+* Find $P(Y \mid X + Y = n)$.
+
+* Find $E(Y \mid X + Y = n)$.
+
+:::
+
+* Recall that if $X \sim \text{Poisson}(\lambda)$, then
+
+  $$
+  P(X = k) = \frac{e^{-\lambda}\; \lambda^k}{k!}
+  $$
+
+* Also, as $X \bot Y$, then $X + Y \sim \text{Poisson}(\lambda + \mu)$.
+
+  Proof:
+  
+  * We must show that
+  
+    $$
+    P(X + Y = n) = \frac{e^{-(\lambda + \mu)}\;(\lambda + \mu)^n}{n!}
+    $$
+
+  * We develop $P(X + Y = n)$ as
+  
+    $$
+    \begin{align}
+    P(X + Y = n)
+    &= \sum_{i = 0}^n P(X = i)\;P(Y = n - i) \\
+    &= \sum_{i = 0}^n \frac{e^{-\lambda}\; \lambda^i}{i!} \cdot 
+       \frac{e^{-\mu}\; \mu^{n-i}}{(n-i)!} \\
+    &= e^{-(\lambda + \mu)}\; \sum_{i = 0}^n \frac{\lambda^i}{i!} \cdot 
+       \frac{\mu^{n-i}}{(n-i)!} \\
+    \end{align}
+    $$
+    
+  * Now we must show that
+  
+    $$
+    \frac{(\lambda + \mu)^n}{n!} = \sum_{i = 0}^n \frac{\lambda^i}{i!}\cdot 
+       \frac{\mu^{n-i}}{(n-i)!}
+    $$
+    
+  * Well, by the binomial theorem,
+  
+    $$
+    \begin{align}
+    (\lambda + \mu)^n 
+    &= \sum_{i=0}^n \binom{n}{i} \;\lambda^i\; \mu^{n-i} \\
+    &= \sum_{i=0}^n \frac{n!}{i! (n-i)!} \;\lambda^i\; \mu^{n-i} \\
+    &= n! \;\sum_{i=0}^n \frac{\lambda^i\; \mu^{n-i}}{i! (n-i)!} 
+    \end{align}
+    $$
+    
+    which makes
+    
+    $$
+    \frac{(\lambda + \mu)^n}{n!} = \sum_{i = 0}^n \frac{\lambda^i}{i!}\cdot 
+       \frac{\mu^{n-i}}{(n-i)!}
+    $$
+
+* Now...
