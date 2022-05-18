@@ -746,6 +746,8 @@ Note this is a function of $x$.
 
 * Also, as $X \bot Y$, then $X + Y \sim \text{Poisson}(\lambda + \mu)$.
 
+  ::: {.rmdbox latex=1}
+  
   Proof:
   
   * We must show that
@@ -791,5 +793,185 @@ Note this is a function of $x$.
     \frac{(\lambda + \mu)^n}{n!} = \sum_{i = 0}^n \frac{\lambda^i}{i!}\cdot 
        \frac{\mu^{n-i}}{(n-i)!}
     $$
+    
+  :::
+  
+* To get $P(Y \mid X + Y = n)$:
 
-* Now...
+  $$
+  \begin{align}
+  P(Y = y \mid X + Y = n) 
+  &= \frac{P(Y = y, X + Y = n)}{P(X + Y = n)} \\
+  &= \frac{P(Y = y, X = n - y)}{P(X + Y = n)} \\
+  &= \frac{P(Y = y) P(X = n - y)}{P(X + Y = n)} & \text{(by indep.)}\\
+  &= \frac{
+      \frac{e^{-\mu} \mu^y}{y!} \cdot
+      \frac{e^{-\lambda} \lambda^{n - y}}{(n - y)!}
+    }{
+      \frac{e^{-(\mu + \lambda)} (\mu + \lambda)^{n}}{n!}
+    } \\
+  &= \frac{n!}{y! (n - y)!} \cdot
+      \frac{\mu^y \lambda^{n-y}}{(\mu + \lambda)^n} \cdot
+      \frac{e^{-(\mu+\lambda)}}{e^{-(\mu+\lambda)}} \\
+  &= \binom{n}{y} \frac{\mu^y \lambda^{n-y}}{(\mu + \lambda)^n} \\
+  &= \binom{n}{y} 
+     \frac{\mu^y}{(\mu + \lambda)^y}
+     \frac{\lambda^{n-y}}{(\mu + \lambda)^{n-y}} \\
+  &= \binom{n}{y} 
+     \left( \frac{\mu}{\mu + \lambda} \right)^y
+     \left( \frac{\lambda}{\mu + \lambda} \right)^{n-y}
+  \end{align}
+  $$
+
+* So $Y \mid X + Y = n \sim \text{Binom}\left(n, \frac{\mu}{\mu + \lambda}\right)$.
+
+* And this makes it easy to find $E(Y \mid X + Y = n)$: as for any binomial RV, 
+
+  $$
+  E(Y \mid X + Y = n) = n \cdot \frac{\mu}{\mu + \lambda}
+  $$
+  
+
+### Example 1.19 (Continuous case) {-}
+
+::: {.rmdbox latex=1}
+
+* Assume $X$ and $Y$ have joint density
+
+  $$
+  f(x, y) = \frac{2}{xy}, \text{ for } 1 < y < x < e
+  $$
+
+* Find $E(Y \mid X = x)$.
+
+:::
+
+* Let's start with the obligatory 3D graph of $f(x, y) = 2/xy$:
+
+    ```{r echo=FALSE}
+    U <- c(
+      0.732903778553009, 0.320359438657761, -0.600183129310608, 0,
+      -0.680093824863434, 0.321718066930771, -0.658762276172638, 0,
+      -0.0179509744048119, 0.89099109172821, 0.453663349151611, 0, 
+      0, 0, 0, 1
+    )
+    
+    UM <- matrix(U, nrow = 4)
+    
+    par3d(
+      userMatrix = UM
+    )
+    
+    persp3d(
+      function(x, y) {
+        ifelse(y < x, 2 / (x * y), NA)
+      },
+      xlim = c(1, exp(1)),
+      ylim = c(1, exp(1)),
+      col = 'blue',
+      alpha = .4,
+      zlab = ''
+    )
+    ```
+
+* First, find $f_{Y\mid X}(y \mid x) = \frac{f(x, y)}{f_X (x)}$.
+
+* For that, we need $f_X(x)$:
+
+  $$
+  \begin{align}
+  f_X(x) 
+  &= \int_1^x f(x, y) \; dy \\
+  &= \int_1^x \frac{2}{xy} \; dy \\
+  &= \frac{2}{x} \int_1^x \frac{dy}{y} \\
+  &= \frac{2\ln x}{x} & \text{ for } 1 < x < e
+  \end{align}
+  $$
+  
+    ```{r echo=FALSE}
+    ggplot() +
+      stat_function(
+        fun = function(x) 2 * log(x) / x,
+        xlim = c(1, exp(1))
+      ) +
+      labs(
+        x = NULL,
+        y = NULL,
+        title = TeX('$f_X(x) = \\frac{2\\,\\ln\\, x}{x}$')
+      )
+    ```
+  
+* So, the conditional density is
+
+  $$
+  \begin{align}
+  f_{Y\mid X}(y \mid x) 
+  &= \frac{f(x, y)}{f_X (x)} \\
+  &= \frac{2 / xy}{2 \ln x / x} \\
+  &= \frac{1}{y \ln x}
+  \end{align}
+  $$
+
+    ```{r echo=FALSE, fig.height=12}
+    x <- c(1.5, 1.75, 2, 2.25, 2.5, 2.7)
+    
+    plot_fyIx <- function(x) {
+      
+      ln_x <- log(x)
+      
+      ggplot() +
+        stat_function(
+          fun = function(y) 1 / (y * ln_x),
+          xlim = c(1, x)
+        ) +
+        scale_y_continuous(limits = c(0, 2.5)) +
+        labs(
+          x = 'y',
+          y = NULL,
+          title = TeX(
+              '$f_{Y \\,|\\, X}(y \\,|\\, x) = \\frac{1}{y \\,\\ln\\, x}$'
+          ),
+          subtitle = TeX(paste0('with $x = {}$', x))
+        ) +
+        theme(
+          plot.background = element_rect(color = 'black'),
+          plot.margin = margin(50, 20, 20, 20)
+        )
+      
+    }
+    
+    graphs <- x %>% 
+      map(plot_fyIx)
+        
+    wrap_plots(
+      graphs, 
+      ncol = 2
+    )
+    ```
+
+* And the conditional expectation is
+
+  $$
+  \begin{align}
+  E(Y \mid X = x)
+  &= \int_1^x y\; f_{Y\mid X} (y \mid x)\;dy \\
+  &= \int_1^x y\; \frac{1}{y\;\ln x} \;dy \\
+  &= \int_1^x \frac{dy}{\ln x} \;dy \\
+  &= \frac1{\ln x}\int_1^x dy \\
+  &= \frac{x - 1}{\ln x}
+  \end{align}
+  $$
+    
+```{r echo=FALSE, warning=FALSE}
+    ggplot() +
+      stat_function(
+        fun = function(x) (x - 1) / log(x),
+        xlim = c(1, exp(1))
+      ) +
+      labs(
+        x = NULL,
+        y = NULL,
+        title = TeX('E(Y \\,|\\, X = x) = \\frac{x - 1}{\\ln\\,x}')
+      )
+    ```
+
