@@ -471,6 +471,97 @@ $$
   \end{aligned}
   $$
 
+* Tibbles and Graphs:
+
+  * Joint distribution:
+  
+    ```{r echo=FALSE}
+    df <- expand_grid(
+      x = 0:2,
+      y = 0:2,
+    ) %>% 
+      mutate(
+        pxy = (x + y) / 18
+      )
+    
+    df
+    ```
+  
+    ```{r echo=FALSE, cache=TRUE}
+    x <- c(0, 1, 2)
+    y <- x
+    grid <- expand_grid(x = x, y = y)
+    side <- .05
+    pxy <- function(x, y) (x + y) / 18
+    
+    plot_joint_discrete <- function(grid, side, pxy) {
+      
+      pts <- map2(
+        grid$x, 
+        grid$y,
+        ~list(
+          x = .x,
+          y = .y,
+          xverts = rep(.x, 4) + c(-1, -1, 1, 1) * side,
+          yverts = rep(.y, 4) + c(-1, 1, 1, -1) * side
+        )
+      )
+      
+      pts %>% 
+        walk(
+          ~shade3d(
+            extrude3d(
+              x = .$xverts,
+              y = .$yverts,
+              thickness = pxy(.$x, .$y)
+            ),
+            alpha = .5
+          )
+        )
+      
+      axes3d(c('x--', 'x+-'), at = grid$x)
+      axes3d(c('y--', 'y+-'), at = grid$y)
+      axes3d(c('z--', 'z-+', 'z+-', 'z++'), labels = FALSE)
+      
+      title3d(xlab = 'x', ylab = 'y')
+      
+    }
+    
+    U <- c(
+      0.732903778553009, 0.320359438657761, -0.600183129310608, 0,
+      -0.680093824863434, 0.321718066930771, -0.658762276172638, 0,
+      -0.0179509744048119, 0.89099109172821, 0.453663349151611, 0, 
+      0, 0, 0, 1
+    )
+    
+    UM <- matrix(U, nrow = 4)
+    
+    par3d(
+      userMatrix = UM
+    )
+    
+    plot_joint_discrete(grid, side, pxy)
+    ```
+
+  * Marginal for $X$:
+  
+    ```{r echo=FALSE}
+    df %>% 
+      group_by(x) %>% 
+      ggplot() +
+        geom_col(
+          aes(x, pxy, fill = paste0('y = ', y)),
+          width = .05
+        ) +
+        scale_x_continuous(
+          breaks = 0:2
+        ) +
+        labs(
+          y = TeX('$P_X (x)$'),
+          fill = NULL
+        )
+    ```
+  
 
 ### Example 1.15 (Continuous RVs) {-}
 
@@ -488,7 +579,7 @@ $$
 
 * Just for fun, here is an [interactive]{.hl} graph of $f(x, y) = e^{-x}$ in part of this domain:
 
-    ```{r echo=FALSE, message=FALSE}
+    ```{r echo=FALSE, message=FALSE, cache=TRUE}
     U <- c(
       0.732903778553009, 0.320359438657761, -0.600183129310608, 0,
       -0.680093824863434, 0.321718066930771, -0.658762276172638, 0,
@@ -565,7 +656,7 @@ $$
   
 * The probability corresponds to the area of the [rectangle outlined in red]{.hl} in the graph below, [after the area of the green strip is normalized to $1$]{.hl}; in other words, the rectangle outlined in red has $2/5$ of the area of the green strip.
 
-    ```{r echo=FALSE, message=FALSE}
+    ```{r echo=FALSE, message=FALSE, cache=TRUE}
     U <- c(
       0.732903778553009, 0.320359438657761, -0.600183129310608, 0,
       -0.680093824863434, 0.321718066930771, -0.658762276172638, 0,
@@ -848,7 +939,7 @@ Note this is a function of $x$.
 
 * Let's start with the obligatory 3D graph of $f(x, y) = 2/xy$:
 
-    ```{r echo=FALSE}
+    ```{r echo=FALSE, cache=TRUE}
     U <- c(
       0.732903778553009, 0.320359438657761, -0.600183129310608, 0,
       -0.680093824863434, 0.321718066930771, -0.658762276172638, 0,
@@ -974,4 +1065,263 @@ Note this is a function of $x$.
         title = TeX('E(Y \\,|\\, X = x) = \\frac{x - 1}{\\ln\\,x}')
       )
     ```
+
+
+### Properties of conditional expectation {-}
+
+::: {.rmdnote latex=1}
+
+1. Linearity:
+
+   $$
+   E(aY + bZ \mid X = x) \,=\,
+   a\;E(Y \mid X = x) + b\;E(Z \mid X = x)
+   $$
+
+1. LOTUS:
+
+   $$
+   E(g(Y) \mid X = x) =
+   \begin{cases}
+     \sum_y \;g(y)\; P(Y = y \mid X = x) 
+     & \text{(discrete)} \\ 
+     \\
+     \int_{-\infty}^\infty g(y)\; f_{Y\mid X}(y\mid x)\;dy 
+     & \text{(continuous)} 
+   \end{cases}
+   $$
+
+1. Independence: if $X \bot Y$:
+
+   $$
+   E(Y \mid X = x) = E(Y)
+   $$
+
+1. If $Y = g(x)$:
+
+   $$
+   E(Y \mid X = x) = g(x)
+   $$
+
+:::
+
+
+### Conditional expectation given an event {-}
+
+::: {.rmdnote latex=1}
+
+* Given an event $A$, the [indicator]{.hl} for $A$ is the RV
+
+  $$
+  I_A = 
+  \begin{cases}
+  1 & \text{if }A\text{ occurs} \\
+  0 & \text{if }A\text{ does not occur} 
+  \end{cases}
+  $$
+
+* If $P(A) > 0$, the [conditional expectation of $Y$ given $A$]{.hl} is
+
+  $$
+  E(Y \mid A) = \frac{E(YI_A)}{P(A)}
+  $$
+
+* In the discrete case, 
+
+  $$
+  E(Y \mid A) = \sum_y y\;P(Y=y \mid A)
+  $$
+
+:::
+
+
+### Total expectation {-}
+
+::: {.rmdnote latex=1}
+
+* Let $Y$ be a RV.
+
+* Let $A_1, \ldots, A_k$ be a partition of the sample space.
+
+* Then
+
+  $$
+  E(Y) = \sum_{i=1}^k E(Y \mid A_i)\;P(A_i)
+  $$
+
+:::
+
+
+### Example 1.21 (Coin flips to get two heads) {-}
+
+::: {.rmdbox latex=1}
+
+* A fair coin is flipped repeatedly.
+
+* What's the expected number of flips needed to get two heads in a row?
+
+:::
+
+* As with total probability, we can condition on events that partition the sample space.
+
+* We use
+
+  * $T = {}$ the first flip is tails.
+  
+  * $HH = {}$ the first two flips are heads. 
+  
+  * $HT = {}$ the first two flips are heads and tails.
+  
+* Then
+
+  $$
+  E(X) = E(X \mid T)\;P(T) 
+  + E(X \mid HH)\;P(HH)
+  + E(X \mid HT)\;P(HT)
+  $$
+
+* We compute
+
+  * $E(X \mid T)\;P(T) = (1 + E(X)) \cdot 1/2$
+  
+  * $E(X \mid HH)\;P(HH) = 2 \cdot 1/4$
+  
+  * $E(X \mid HT)\;P(HT) = (2 + E(X)) \cdot 1/4$
+  
+* Replacing these values and solving for $E(X)$, we get $E(X) = 6$.
+
+
+### Example 1.22 (Bob's pizza) {-}
+
+::: {.rmdbox latex=1}
+
+* Every day Bob goes to the pizza shop, orders a slice of pizza, and picks a topping uniformly at random: pepper, pepperoni, pineapple, prawns, or prosciutto. 
+
+* On the day that Bob first picks pineapple, find the expected number of prior days in which he picked pepperoni.
+
+:::
+
+* Let $X$ be the number of days before he picked pineapple.
+
+* Then $X \sim \text{Geom}(1/5)$, and
+
+  $$
+  \begin{align}
+  P(X = x) &= \left( \frac45 \right)^{x-1} \cdot \frac15 \\
+  E(X) &= \sum_{x=1}^\infty x \cdot \left( \frac45 \right)^{x-1} \cdot \frac15 = 5
+  \end{align}
+  $$
+
+* Let $Y$ be the number of days he picked pepperoni, before he picked pineapple. 
+
+* Given $X = x$, we have $Y \sim \text{Binom}(x-1, 1/4)$.
+
+* We want $E(Y)$.
+
+* We condition on the value of $X$:
+
+  $$
+  E(Y \mid X=x) = \frac{x - 1}4
+  $$
+
+  which is the expected value of the binomial.
+  
+* Now we compute
+
+  $$
+  \begin{align}
+  E(Y) 
+  &= 
+  \sum_{x = 1}^\infty E(Y \mid X=x) \cdot P(X = x) \\
+  &= 
+  \sum_{x = 1}^\infty \frac{x-1}4 \cdot \left( \frac45 \right)^{x-1} \!\!\!\cdot \frac15 \\
+  &= 
+  \frac14 \sum_{x = 1}^\infty x \cdot \left( \frac45 \right)^{x-1} \!\!\!\cdot \frac15 
+  \;-\;
+  \frac14 \sum_{x = 1}^\infty \left( \frac45 \right)^{x-1}\!\!\!\cdot \frac15 \\
+  &= 
+  \frac14 E(X) \;-\;
+  \frac1{20} \sum_{x = 1}^\infty \left( \frac45 \right)^{x-1} \\
+  &= 
+  \frac54 \;-\; \frac1{20} \cdot \frac{1}{1 - 4/5} \\
+  &= 1
+  \end{align}
+  $$
+
+
+### Example 1.23 (Exponential) {-}
+
+::: {.rmdbox latex=1}
+
+* The time that Joe spends talking on the phone is exponentially distributed with mean $5$ minutes. 
+
+* What is the expected length of his phone call if he talks for more than $2$ minutes?
+
+:::
+
+* Let $X$ be the time Joe spends on the phone. 
+
+* Then $X \sim \text{Exp}(\lambda = 1/5)$. Recall that $\lambda$ is the [rate]{.hl}, which is the [reciprocal of the mean]{.hl}.
+
+* $X$ has pdf
+
+  $$
+  f(x) = \lambda e^{-x\lambda} = \frac15e^{-x/5}
+  $$
+
+    ```{r echo=FALSE}
+    ggplot() +
+      stat_function(
+        fun = dexp,
+        args = c(rate = 1/5),
+        xlim = c(0, 20)
+      ) +
+      labs(
+        title = TeX('$X \\sim\\, \\textrm{Exp}(1/5)$'),
+        x = 'x',
+        y = NULL
+      )
+    ```
+
+* And the expected value of $X$ is $E(X) = 1/\lambda = 5$ minutes.
+
+* We want $E(X \mid X > 2)$.
+
+* We compute
+
+  $$
+  \begin{align}
+  E(X \mid X > 2)
+  &= \frac{E(X \; I_{X>2})}{P(X>2)} \\
+  &= \frac{\int_2^\infty x \cdot \frac15 e^{-x/5}\;dx}{P(X>2)} \\
+  \end{align}
+  $$
+  
+* In R:
+
+    ```{r}
+    numerator <- integrate(
+      function(x) x / 5 * exp(-x / 5),
+      lower = 2,
+      upper = Inf
+    )
+    numerator
+    
+    denominator <- pexp(2, 1/5, lower.tail = FALSE)
+    denominator
+    
+    numerator$value / denominator
+    ```
+
+  ::: {.rmdimportant latex=1}
+  
+  * Because of the [memorylessness]{.hl} of the exponential, we have
+  
+    $$
+    E(X \mid X > 2) = E(2 + X) = 2 + E(X) = 2 + 5 = 7
+    $$
+  
+    which gives us the answer immediately.
+  
+  :::
 

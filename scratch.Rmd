@@ -1,0 +1,22 @@
+
+```{r}
+df <- expand_grid(
+  x = 0:2,
+  y = 0:2,
+) %>% 
+  mutate(
+    pxy = (x + y) / 18
+  )
+
+df
+```
+
+```{r}
+df %>% 
+  group_by(x) %>% 
+  ggplot() +
+    geom_col(
+      aes(x, pxy, fill = factor(y))
+    )
+```
+
